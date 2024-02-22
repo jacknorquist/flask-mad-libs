@@ -12,21 +12,21 @@ debug = DebugToolbarExtension(app)
 
 @app.get("/")
 def choose_story():
-    return render_template("stories.html", stories = STORIES)
+    return render_template("stories.html", stories = STORIES.keys())
 
 @app.get('/questions')
 def show_story_form():
     """Show madlibs form based on Story instance"""
+    current_story = request.args["Stories"]
+    prompts = STORIES.get(request.args["Stories"]).prompts
+    return render_template("questions.html", story_name = current_story, prompts = prompts)
 
-    prompts = request.args
-    return render_template("questions.html", prompts = prompts)
 
-
-@app.get('/<story>/results')
-def show_results():
+@app.get('/<story_name>/results')
+def show_results(story_name):
     """Create a story based on form query parameters"""
-
-    story = silly_story.get_result_text(request.args)
-    return render_template("results.html", story = story)
+    story = STORIES.get(story_name)
+    text = story.get_result_text(request.args)
+    return render_template("results.html", text = text)
 
 #a=request.args.get("a")
